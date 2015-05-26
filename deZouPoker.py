@@ -1,13 +1,12 @@
 
-#!/usr/bin/python
-#coding:utf-8
-
+#-*- coding: UTF-8 -*-
+from __future__ import unicode_literals
 
 import random
 
 
 class poker:
-    color = 0    #1£ººìĞÄ   2£º·½¿é     3£ºÃ·»¨     4£ººÚÌÒ
+    color = 0    #1ï¼šçº¢å¿ƒ   2ï¼šæ–¹å—     3ï¼šæ¢…èŠ±     4ï¼šé»‘æ¡ƒ
     number = 1
     
     def __init__(self, c, n):
@@ -21,13 +20,13 @@ class poker:
         
     def show(self):
         if self.color == 1:
-            print 'ºìĞÄ',
+            print 'çº¢å¿ƒ',
         if self.color == 2:
-            print '·½¿é',
+            print 'æ–¹å—',
         if self.color == 3:
-            print 'Ã·»¨',
+            print 'æ¢…èŠ±',
         if self.color == 4:
-            print 'ºÚÌÒ',
+            print 'é»‘æ¡ƒ',
         if self.number == 14:
             print 'A' + ' ',
         elif self.number == 13:
@@ -121,8 +120,14 @@ class Match():
         
         
     def isSixthKind(self):
-        if (self.pokers[0].number == (self.pokers[1].number + 1))and(self.pokers[1].number == (self.pokers[2].number + 1))and(self.pokers[2].number == (self.pokers[3].number + 1))and(self.pokers[3].number == self.pokers[4].number + 1):
-            #print 'Ë³×Ó'
+        if ((self.pokers[0].number == (self.pokers[1].number + 1)) or (self.pokers[0].number == 14 and self.pokers[4].number == 2))and(self.pokers[1].number == (self.pokers[2].number + 1)) \
+           and(self.pokers[2].number == (self.pokers[3].number + 1))\
+           and(self.pokers[3].number == self.pokers[4].number + 1):
+            
+            if self.pokers[4].number == 2 and self.pokers[0].number == 14:
+                temp = self.pokers[0]
+                self.pokers[0] = self.pokers[4]
+                self.pokers[4] = temp                
             return True
         else:
             return False
@@ -132,24 +137,24 @@ class Match():
             if (self.pokers[1].color == self.pokers[2].color):
                 if (self.pokers[2].color == self.pokers[3].color):
                     if (self.pokers[3].color == self.pokers[4].color):
-                        #print 'Í¬»¨'
+                        #print 'åŒèŠ±'
                         return True
                     else:
-                        #print '²»ÊÇÍ¬»¨'
+                        #print 'ä¸æ˜¯åŒèŠ±'
                         return False
                 else:
-                    #print '²»ÊÇÍ¬»¨'
+                    #print 'ä¸æ˜¯åŒèŠ±'
                     return False
             else:
-                #print '²»ÊÇÍ¬»¨'
+                #print 'ä¸æ˜¯åŒèŠ±'
                 return False
         else:
-            #print '²»ÊÇÍ¬»¨'
+            #print 'ä¸æ˜¯åŒèŠ±'
             return False
       
     def isSecondeKind(self):
         if ((self.isFifthKind() ) and (self.isSixthKind() )):
-            #print 'Í¬»¨Ë³'
+            #print 'åŒèŠ±é¡º'
             return True
         else:
             return False
@@ -157,21 +162,21 @@ class Match():
        
         mixArray = []
         flag = 0
-        fatalNumber = 0
+        fatalIndex = 0
+        fatalArray = []
         sameOne = [0, 0] 
         sameTwo = [0, 0]
         level = 0
         print 'begin matchSame'
         for i in range(0, 5):
-            #self.pokers[i].show()
-            #print self.pokers[i].number
             j = i + 1
             while(j < 5):
                 if (self.pokers[i].number == self.pokers[j].number):
                     
-                    if (sameOne[1] == self.pokers[j].number):
-                        sameOne[0] += 1
-                                                
+                    if (sameOne[1] == self.pokers[j].number):  #sameOne é‡Œé¢æ”¾ç¬¬ä¸‰å¼ ï¼Œæˆ–ä¸€å‰¯å¤§é˜Ÿå­
+                        sameOne[0] += 1                        #sameTwo é‡Œé¢æ”¾å°é˜Ÿï¼Œå¦‚æœ‰æœ‰ç¬¬äºŒå‰¯é˜Ÿå­
+                        fatalIndex += 1      
+                                        
                     elif sameOne[0] != 0:
                         
                         if(sameTwo[1] == self.pokers[j].number):
@@ -185,7 +190,8 @@ class Match():
    
                     else:
                         sameOne[1] = self.pokers[j].number
-                        sameOne[0] = 2                        
+                        sameOne[0] = 2  
+                        fatalIndex = j
   
                     flag += 1
                 j += 1
@@ -195,42 +201,65 @@ class Match():
             sameTwo[0] = 3        
         if flag == 6:
             level = 8
-            if self.pokers[0].number == sameOne[1]:
-                fatalNumber = sameOne[i]
+            fatalArray.append(sameOne[1])
+            if fatalIndex == 3:
+                fatalArray.append(self.pokers[4].number)
             else:
-                fatalNumber = self.pokers[4].number
+                fatalArray.append(self.pokers[0].number)
+                
         if flag == 4:
             level = 7
-            if sameOne[0] == 3:
-                fatalNumber = sameOne[1]
-            else:
-                fatalNumber = sameTwo[1]
+            fatalArray.append(sameOne[1])
+            fatalArray.append(sameTwo[1])
             
         if flag == 3:
             level = 4
-            if self.pokers[0].number == sameOne[1]:
-                fatalNumber = self.pokers[3].number
-            else:
-                fatalNumber = self.pokers[0].number
+            fatalArray.append(sameOne[1])
+            if fatalIndex == 2:
+                fatalArray.append(self.pokers[3].number)
+                fatalArray.append(self.pokers[4].number)
+            if fatalIndex == 3:
+                fatalArray.append(self.pokers[0].number)
+                fatalArray.append(self.pokers[4].number)
+            if fatalIndex == 4:
+                fatalArray.append(self.pokers[0].number)
+                fatalArray.append(self.pokers[1].number)
         
         if flag == 2:
             level = 3
-            if ((self.pokers[0].number != sameOne[1])and(self.pokers[0].number != sameTwo[1])):
-               
-                fatalNumber = self.pokers[0].number
+            if fatalIndex == 2:
+                fatalArray.append(sameOne[1])
+                fatalArray.append(sameTwo[1])
             else:
-                fatalNumber = self.pokers[4].number
-                
+                if self.pokers[2].number == self.pokers[3].number:
+                    fatalArray.append(self.pokers[4].number)
+                else:
+                    fatalArray.append(self.pokers[2].number)
+                             
         if flag == 1:
             level = 2
-            if self.pokers[0].number != sameOne[1]:
-                fatalNumber = self.pokers[0].number
+            fatalArray.append(sameOne[1])
+            if fatalIndex == 1:
+                fatalArray.append(self.pokers[2].number)
+                fatalArray.append(self.pokers[3].number)
+                fatalArray.append(self.pokers[4].number)
+            elif fatalIndex == 2:
+                fatalArray.append(self.pokers[0].number)
+                fatalArray.append(self.pokers[3].number)
+                fatalArray.append(self.pokers[4].number)
+            elif fatalIndex == 3:
+                fatalArray.append(self.pokers[0].number)
+                fatalArray.append(self.pokers[1].number)
+                fatalArray.append(self.pokers[4].number)
             else:
-                fatalNumber = self.pokers[2].number
+                fatalArray.append(self.pokers[0].number)
+                fatalArray.append(self.pokers[1].number)
+                fatalArray.append(self.pokers[2].number)
+                
                  
         if flag == 0:
             level = 1
-            fatalNumber = self.pokers[0].number
+            
             if self.isSixthKind():
                 level = 5
                 flag = -1
@@ -243,167 +272,102 @@ class Match():
                 if self.pokers[0].number == 14:
                     flag = -4
                     level = 10
-        mixArray.append(flag)
+            for i in range(0, 5):
+                fatalArray.append(self.pokers[i].number)            
+        mixArray.append(level)
         mixArray.append(sameOne)
         mixArray.append(sameTwo)
-        mixArray.append(fatalNumber)
-        mixArray.append(level)
+        mixArray.append(fatalArray) 
         mixArray.append(self.pokers)
         print 'match is end'
         return mixArray
 
+def showPoker(number):
+    if number == 14:
+        return 'A'
+    elif number == 13:
+        return 'K'
+    elif number == 12:
+        return 'Q'
+    elif number == 11:
+        return 'J' 
+    else:
+        return '%s'%number    
+    
+
+
+
 def showResult(resultBox):
     result = resultBox
-    flag = result[0]
+    level = result[0]
     sameOne = result[1]
     sameTwo = result[2]
-    fatalNumber = result[3]
-    pokers = resultBox[5]
+    fatalNumber = result[3][0]
+    pokers = result[4]
     
-    if flag == 6:
-        print 'four bar:ËÄÕÅ%d'%(sameOne[1])
-    elif flag == 4:
-        print 'hu lu: %d¸ö%d, %d¸ö%d'%(sameOne[0], sameOne[1], sameTwo[0], sameTwo[1])
-    elif flag == 3:
-        print 'three bar:ÈıÕÅ%d'%(sameOne[1])
-    elif flag == 2:
-        print 'double que Ò»¶Ô%d Ò»¶Ô%d'%(sameOne[1], sameTwo[1])
-    elif flag == 1:
-        print 'One que Ò»¶Ô%d %d×î´ó'%(sameOne[1],fatalNumber) 
-    elif flag == 0:
-        print '¸ßÅÆ: %d×î´ó:'%fatalNumber
-    elif flag == -1:
-        print 'Ë³×Ó: %d´ó'%fatalNumber
-    elif flag == -2:
-        print 'Í¬»¨: %d'%fatalNumber
-    elif flag == -3:
-        print 'Í¬»¨Ë³: %d'%fatalNumber
-    elif flag == -4:
-        print '»Ê¼ÒÍ¬»¨Ë³'    
+    
+    if level == 10:
+        print 'çš‡å®¶åŒèŠ±é¡º'
+        
+    elif level == 9:
+        print 'åŒèŠ±é¡º: %så¤§'%showPoker(fatalNumber)
+        
+    elif level == 8:
+        print 'å››æ¡:å››å¼ %s'%(showPoker(sameOne[1]))
+       
+    elif level == 7:
+        print 'è‘«èŠ¦: %dä¸ª%s, %dä¸ª%s'%(sameOne[0], showPoker(sameOne[1]), sameTwo[0], showPoker(sameTwo[1]))
+       
+    elif level == 6:
+        print 'åŒèŠ±: %så¤§'%showPoker(fatalNumber)
+        
+    elif level == 5:
+        print 'é¡ºå­: %så¤§'%showPoker(fatalNumber)
+        
+    elif level == 4:
+        print 'ä¸‰æ¡:ä¸‰å¼ %s'%showPoker(sameOne[1])
+        
+    elif level == 3:
+        print 'ä¸¤é˜Ÿ: ä¸€å¯¹%s ä¸€å¯¹%s'%(showPoker(sameOne[1]), showPoker(sameTwo[1]))
+        
+    elif level == 2:
+        print 'å¯¹å­: ä¸€å¯¹%s'%(showPoker(sameOne[1])) 
+        
+    elif level == 1:
+        print 'é«˜ç‰Œ: %så¤§:'%showPoker(fatalNumber)
+            
     for i in range (0, 5):
         pokers[i].show()
     print '\n'
 
 def showWin(result):
     win = 0
-    level = result[0][4]
-    fatalNmuber1 = result[0][3]
-    fatalNmuber2 = result[1][3]
-    OneNumber1 = result[0][1][1]
-    OneNumber2 = result[0][2][1]
-    TwoNumber1 = result[1][1][1]
-    TwoNumber2 = result[1][2][1]
-    pokers1 = result[0][5]
-    pokers2 = result[1][5]
-    if result[0][4] > result[1][4]:
+    level = result[0][0]
+    level1 = result[0][0]
+    level2 = result[1][0]
+    fatalArray1 = result[0][3]
+    fatalArray2 = result[1][3]
+
+    if level1 > level2:
         win = 1
-    elif result[0][4] < result[1][4]:
+    elif level1 < level2:
         win = 2
     else:
-        if ((level == 10)or(level == 9)or(level == 6)or(level == 5)):
-            if fatalNmuber1 > fatalNmuber2:
+        for i in range(0, len(fatalArray1)):
+            if fatalArray1[i] > fatalArray2[i]:
                 win = 1
-            elif fatalNmuber1 < fatalNmuber2:
+                break
+            elif fatalArray1[i] < fatalArray2[i]:
                 win = 2
+                break
             else:
-                win = 0
-        elif level == 8:
-            if OneNumber1 > TwoNumber1:
-                win = 1
-            elif OneNumber1 < TwoNumber1:
-                win = 2
-            else:
-                if fatalNmuber1 > fatalNmuber2:
-                    win  = 1
-                elif fatalNmuber1 < fatalNmuber2:
-                    win = 2
-                else:
-                    win = 0
-        elif level == 7:
-            if OneNumber1 > TwoNumber1:
-                win = 1
-            elif OneNumber1 < TwoNumber1:
-                win = 2
-            else:
-                if OneNumber2 > TwoNumber2:
-                    win = 1
-                elif OneNumber2 < TwoNumber2:
-                    win = 2
-                else:
-                    win = 0
-        elif level == 4:
-            if OneNumber1 > TwoNumber1:
-                win = 1
-            elif OneNumber1 < TwoNumber1:
-                win = 2
-            else:
-                if fatalNmuber1 > fatalNmuber2:
-                    win = 1
-                elif fatalNmuber1 < fatalNmuber2:
-                    win = 2
-                else:
-                    win = 0
-        
-        
-                
-                
-            
-                
-            
-    
-
-
-
-
-
-        elif level == 3:
-    
-            if OneNumber1 > TwoNumber1:
-                win = 1
-            elif OneNumber1 < TwoNumber1:
-                win = 2
-            else:
-                if OneNumber2 > TwoNumber2:
-                    win = 1
-                elif OneNumber2 < TwoNumber2:
-                    win = 2
-                else:
-                    if fatalNmuber1 > fatalNmuber2:
-                        win = 1
-                    elif fatalNmuber1 < fatalNmuber2:
-                        win = 2
-                    else:
-                        win = 0                    
-        elif level == 2:
-            if OneNumber1 > TwoNumber1:    
-                win = 1
-            elif OneNumber1 < TwoNumber1:
-                win = 2
-            else:
-                if fatalNmuber1 > fatalNmuber2:
-                    win  = 1
-                elif fatalNmuber1 < fatalNmuber2:
-                    win = 2
-                else:
-                    win = 0            
-            
-        elif level == 1:
-            for i in range(0, 4):
-                if pokers1[i].number > pokers2[i].number:
-                    win = 1
-                    break;
-                elif pokers1[i].number < pokers2[i].number:
-                    win = 2
-                    break;
-                else:
-                    win = 0
-                         
+                win = 0                                                    
     if win == 1:
         print 'play1 win'
     elif win == 2:
         print 'play2 win'
     else:
-        print 'The Same£¡£¡'
+        print 'The Sameï¼ï¼'
 
 poker1 = poker(2, 3)
 poker2 = poker(1, 5)
@@ -460,7 +424,7 @@ if playerNumber == 1:
 
 go = (int)(input('press 1 to go on:'))
 if go == 1:
-    print 'go£¡'
+    print 'goï¼'
     
 for i in range(0, 15):
     print '\n'
@@ -493,7 +457,7 @@ if playerNumber == 2:
     print 'Now Your Porks is:'
     for i in range(0, 5):
         PlayTwoPorks[i].show()        
-
+    print '\n'
     matchPlayTwo = Match(poker1, poker2, poker3, poker4, poker5)
     
     matchPlayTwo.pokers = PlayTwoPorks
@@ -502,15 +466,28 @@ if playerNumber == 2:
     
     resultTwo = matchPlayTwo.matchSame()
     result.append(resultTwo)
-  
 
-password = (int)(input('Enter the password to see result:')) 
-if password == 123456:
-    print 'play1 result:'
-    showResult(result[0])
-    print 'play2 result:'
-    showResult(result[1])
-    showWin(result)
+wrongCount = 0  
+for i in range(0, 3):
+
+    password = (int)(input('Enter the password to see result:')) 
+    if password == 123456:
+        print 'play1 result:'
+        showResult(result[0])
+        print 'play2 result:'
+        showResult(result[1])
+        showWin(result)
+        break
+    else:
+        
+        wrongCount += 1
+        if wrongCount == 3:
+                    print 'SBï¼åˆ«æƒ³å·çœ‹' 
+                    break        
+        print 'å¯†ç é”™è¯¯,è¯·é‡è¯•!'
+        
+        continue
+
         
     
     
@@ -553,6 +530,6 @@ if password == 123456:
     
 #if match1.isSecondeKind():
     #if match1.poker1.number  == 14:
-        #print '»Ê¼Ò',
-    #print  'Í¬»¨Ë³'
+        #print 'çš‡å®¶',
+    #print  'åŒèŠ±é¡º'
         
